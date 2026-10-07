@@ -1,0 +1,60 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Data and pipeline output directories
+# Only keep the directory structure in Git via .gitkeep; ignore all data files
+colmap/*
+!colmap/.gitkeep
+
+frames/*
+!frames/.gitkeep
+
+masks/*
+!masks/.gitkeep
+
+ply/*
+!ply/.gitkeep
+
+results/*
+!results/.gitkeep

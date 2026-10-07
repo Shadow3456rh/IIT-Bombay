@@ -1,0 +1,12 @@
+# Layer 2 — Drone Data Augmentation Pipeline
+# Runtime dependencies (install with: pip install -r requirements.txt)
+
+# PLY inspection and numerical operations
+numpy>=1.24.1
+
+# Spatial clustering (Step 9 — DBSCAN)
+scikit-learn>=1.9.1
+
+# Google Drive frame downloader (Step datasets)
+gdown>=6.4.1
+
