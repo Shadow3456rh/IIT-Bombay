@@ -58,3 +58,9 @@ ply/*
 
 results/*
 !results/.gitkeep
+
+# Model checkpoints and weights
+checkpoints/
+*.pt
+*.pth
+*.ckpt

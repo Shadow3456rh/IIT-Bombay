@@ -666,3 +666,86 @@ Why is this necessary? Determining spatial relationships from 2D pixel overlaps 
 
 - **Prototype Assumptions**: The numerical thresholds and resulting `on_score` are prototype geometric heuristics. They are NOT calibrated probabilities.
 - **Lack of True Surfaces**: Bounding Box (AABB) intersection is employed rather than dense 3D surface mesh normal alignment, which remains a limitation bounded by the precision of prototype point-cloud clustering.
+
+---
+
+## Milestone 16 -- Graph Neural Network & 3D Relationship Inference [COMPLETE]
+
+**Modules**:
+- `relationships/graph_builder.py` -- 3D Scene Graph representation (9D node features, 10D directed edge features).
+- `relationships/gnn_model.py` -- Native PyTorch Message-Passing Neural Network (7 relationship classes).
+- `relationships/gnn_dataset.py` -- Leakage-free dataset container, grouping by `scene_id`, and synthetic test fixture generator.
+- `relationships/train_gnn.py` -- Training loop, metrics (accuracy, macro-F1, per-class), and validation-based checkpointing.
+- `relationships/relationship_pipeline.py` -- Inference orchestrator supporting Mode A (geometric baseline) and Mode B (trained GNN).
+- `output/layer2_json.py` -- JSON export supporting original ON-only (v0.1) and extended multi-class schema (v0.2).
+
+### Running All Unit Tests
+
+```bash
+# Run all 17 test suites
+python test_alpha_association.py
+python test_camera.py
+python test_dbscan_cleanup.py
+python test_depth_filter.py
+python test_gaussian_scene.py
+python test_graph_builder.py
+python test_gnn_model.py
+python test_gnn_dataset.py
+python test_gnn_training.py
+python test_relationship_pipeline.py
+python test_layer2_json.py
+python test_multiview.py
+python test_object.py
+python test_object_3d.py
+python test_on_relation.py
+python test_projection_association.py
+python test_validate_frames.py
+```
+
+### Relationship Classes Supported
+
+The GNN reasons over 7 directed relationship classes:
+1. `NONE` (0) -- No significant spatial relationship.
+2. `ON` (1) -- Subject is supported on top of target.
+3. `UNDER` (2) -- Subject is positioned beneath target.
+4. `INSIDE` (3) -- Subject is contained within target.
+5. `NEXT_TO` (4) -- Subject is laterally adjacent to target.
+6. `IN_FRONT_OF` (5) -- Subject is in front of target.
+7. `BEHIND` (6) -- Subject is behind target.
+
+### How to Run Relationship Inference
+
+#### Mode A: Geometric Baseline (No Checkpoint Required)
+```python
+from relationships.relationship_pipeline import RelationshipPipeline
+
+# Evaluates geometric support using AABB constraints
+pipeline = RelationshipPipeline(mode="baseline", up_axis="z")
+result = pipeline.run(objects_3d)
+
+# Export to backward-compatible Layer-2 JSON (v0.1, ON-only)
+layer2_output = result.to_layer2_output(objects_3d, include_all_relations=False)
+```
+
+#### Mode B: Trained GNN Inference (Requires Checkpoint)
+```python
+from relationships.relationship_pipeline import RelationshipPipeline
+
+# Requires an explicit trained checkpoint; never uses random weights silently
+pipeline = RelationshipPipeline(
+    mode="gnn",
+    checkpoint_path="checkpoints/best_model.pt",
+    confidence_threshold=0.5,
+    filter_none=True,
+)
+result = pipeline.run(objects_3d)
+
+# Export to extended Layer-2 JSON (v0.2, multi-class predictions)
+layer2_output = result.to_layer2_output(objects_3d, include_all_relations=True)
+```
+
+### Important Disclaimers & Current Limitations
+
+- **No Real Ground Truth in Repository**: No labeled 3D relationship annotations exist yet in the IIT-Bombay dataset. The synthetic dataset generator is provided strictly for software testing and gradient validation.
+- **Uncalibrated Model Scores**: Softmax confidence scores from the GNN are uncalibrated model outputs and must **not** be treated as real-world probabilities.
+- **Demo PLY Separation**: The demo PLY (`data/ply/3dgs_sr_demo.ply`, ~17,020 Gaussians) does **not** belong to the real IIT-Bombay campus scene. Real IIT-Bombay drone integration requires calibrated camera poses, COLMAP sparse point clouds, and campus-scale Layer-1 reconstructions.

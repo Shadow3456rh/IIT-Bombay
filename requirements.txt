@@ -10,3 +10,12 @@ scikit-learn>=1.9.1
 # Google Drive frame downloader (Step datasets)
 gdown>=6.4.1
 
+# 3D Gaussian Splatting PLY reader
+plyfile>=1.1.5
+
+# Scientific computing and spatial operations
+scipy>=1.18.0
+
+# Graph Neural Network relationship modeling (Stage C/D)
+torch>=2.14.0
+
