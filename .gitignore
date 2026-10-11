@@ -64,3 +64,5 @@ checkpoints/
 *.pt
 *.pth
 *.ckpt
+
+PROJECT_AUDIT_REPORT.md
